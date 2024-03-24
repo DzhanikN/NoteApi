@@ -18,10 +18,16 @@ def get_users():
 @app.route("/users", methods=["POST"])
 def create_user():
     user_data = request.json
+    username = user_data.get("username")
+    
+    existing_user = UserModel.query.filter_by(username=username).first()
+    if existing_user:
+        return {"message": "Username already exists"}, 400
+    
     user = UserModel(**user_data)
-    # TODO: добавить обработчик на создание пользователя с неуникальным username
     user.save()
     return user_schema.dump(user), 201
+
 
 
 @app.route("/users/<int:user_id>", methods=["PUT"])
